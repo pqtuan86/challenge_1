@@ -1,26 +1,54 @@
 package com.demo.userlocationrecording;
 
-import android.support.v4.app.Fragment;
+import java.util.Calendar;
+
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 
 public class MainActivity extends Activity {
 
+	private Context context;
+	private PendingIntent pendingIntent;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		context = this;
 //		if (savedInstanceState == null) {
 //			getSupportFragmentManager().beginTransaction()
 //					.add(R.id.container, new PlaceholderFragment()).commit();
 //		}
+		Intent intent = new Intent(context, GPSTrackingService.class);
+//		context.startService(intent);
+		
+
+		pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+
+
+
+		AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+
+
+
+		Calendar calendar = Calendar.getInstance();
+	
+		calendar.setTimeInMillis(System.currentTimeMillis());
+	
+		calendar.add(Calendar.SECOND, 1*60);
+	
+		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1*60*1000, pendingIntent);
+
 	}
 
 	@Override

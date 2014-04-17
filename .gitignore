@@ -18,3 +18,14 @@ UserLocationRecording/bin/classes/com/demo/userlocationrecording/R.class
 UserLocationRecording/bin/jarlist.cache
 UserLocationRecording/gen/com/demo/userlocationrecording/BuildConfig.java
 UserLocationRecording/gen/com/demo/userlocationrecording/R.java
+UserLocationRecording/bin/UserLocationRecording.apk
+UserLocationRecording/bin/classes.dex
+UserLocationRecording/bin/classes/com/demo/userlocationrecording/database/DatabaseHandler.class
+UserLocationRecording/bin/classes/com/demo/userlocationrecording/database/UserLocation.class
+UserLocationRecording/bin/classes/com/demo/userlocationrecording/database/UserLocationProvider.class
+UserLocationRecording/bin/dexedLibs/android-support-v4-1b020a1c86224f65f713ff1f613f1a0d.jar
+UserLocationRecording/bin/res/crunch/drawable-hdpi/ic_launcher.png
+UserLocationRecording/bin/res/crunch/drawable-mdpi/ic_launcher.png
+UserLocationRecording/bin/res/crunch/drawable-xhdpi/ic_launcher.png
+UserLocationRecording/bin/res/crunch/drawable-xxhdpi/ic_launcher.png
+UserLocationRecording/bin/resources.ap_

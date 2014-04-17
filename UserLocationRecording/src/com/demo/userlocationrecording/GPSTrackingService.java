@@ -32,7 +32,7 @@ public class GPSTrackingService extends Service implements LocationListener {
     double longitude; // longitude
 
     // The minimum distance to change Updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 50; // 50 meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 100; // 50 meters
 
     // The minimum time between updates in milliseconds
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
@@ -40,12 +40,25 @@ public class GPSTrackingService extends Service implements LocationListener {
     // Declaring a Location Manager
     protected LocationManager locationManager;
 
+    public GPSTrackingService(){
+    	this.mContext = this;
+    }
+    
     public GPSTrackingService(Context context) {
         this.mContext = context;
         //getLocation();
     }
 
-    public Location getLocation() {
+    @Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		// TODO Auto-generated method stub
+    	getLocation();
+		return Service.START_STICKY;
+	}
+
+
+
+	public Location getLocation() {
         try {
             locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
 
@@ -56,7 +69,7 @@ public class GPSTrackingService extends Service implements LocationListener {
             isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
             if (!isGPSEnabled && !isNetworkEnabled) {
-                // no network provider is enabled
+                // no available GPS provider
             } else {
                 this.canGetLocation = true;
                 if (isNetworkEnabled) {
@@ -68,12 +81,14 @@ public class GPSTrackingService extends Service implements LocationListener {
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         if (location != null) {
-                            Constant.mLocation = location;
+                            //Constant.mLocation = location;
                             latitude = location.getLatitude();
                             longitude = location.getLongitude();
                         }
                     }
                 }
+                
+                
                 // if GPS Enabled get lat/long using GPS Services
                 if (isGPSEnabled) {
                     if (location == null) {
@@ -85,7 +100,8 @@ public class GPSTrackingService extends Service implements LocationListener {
                         if (locationManager != null) {
                             location = locationManager
                                     .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            Constant.mLocation = location;
+                            Log.i("Location in get====", "lat == " + location.getLatitude() + " lng == " + location.getLongitude());
+                            //Constant.mLocation = location;
                             if (location != null) {
                                 latitude = location.getLatitude();
                                 longitude = location.getLongitude();
@@ -182,12 +198,12 @@ public class GPSTrackingService extends Service implements LocationListener {
         alertDialog.show();
     }
 
-	// To ===================
-	
 	@Override
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
-		Constant.mLocation = location;
+
+		// get the new location here, get the place name, save to database
+		Log.i("Location====", "lat == " + location.getLatitude() + " lng == " + location.getLongitude());
 	}
 
 	@Override
