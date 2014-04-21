@@ -12,12 +12,13 @@ public class UserLocation {
     public static final String COL_ID = "_id";
     // These fields can be anything you want.
     public static final String COL_DATE = "date";
+    public static final String COL_TIME = "time";
     public static final String COL_LAT = "lat";
     public static final String COL_LNG = "lng";
     public static final String COL_NAME = "name";
 
     // For database projection so order is consistent
-    public static final String[] FIELDS = { COL_ID, COL_DATE, COL_LAT,
+    public static final String[] FIELDS = { COL_ID, COL_DATE, COL_TIME, COL_LAT,
     	COL_LNG, COL_NAME };
 
     /*
@@ -29,6 +30,7 @@ public class UserLocation {
             "CREATE TABLE " + TABLE_NAME + "("
             + COL_ID + " INTEGER PRIMARY KEY,"
             + COL_DATE + " TEXT NOT NULL DEFAULT '',"
+            + COL_TIME + " TEXT NOT NULL DEFAULT '',"
             + COL_LAT + " TEXT NOT NULL DEFAULT '',"
             + COL_LNG + " TEXT NOT NULL DEFAULT '',"
             + COL_NAME + " TEXT NOT NULL DEFAULT ''"
@@ -37,6 +39,7 @@ public class UserLocation {
     // Fields corresponding to database columns
     public long id = -1;
     public String date = "";
+    public String time = "";
     public String lat = "";
     public String lng = "";
     public String name = "";
@@ -46,6 +49,16 @@ public class UserLocation {
      */
     public UserLocation() {
     }
+    
+    public UserLocation(String date, String time, String latitude, String longitude, String nameOfPlace){
+    	this.id = -1;
+    	this.date = date;
+    	this.time = time;
+    	this.lat = latitude;
+    	this.lng = longitude;
+    	this.name = nameOfPlace;
+    }
+    
 
     /**
      * Convert information from the database into a UserLocation object.
@@ -54,9 +67,10 @@ public class UserLocation {
         // Indices expected to match order in FIELDS!
         this.id = cursor.getLong(0);
         this.date = cursor.getString(1);
-        this.lat = cursor.getString(2);
-        this.lng = cursor.getString(3);
-        this.name = cursor.getString(4);
+        this.time = cursor.getString(2);
+        this.lat = cursor.getString(3);
+        this.lng = cursor.getString(4);
+        this.name = cursor.getString(5);
     }
 
     /**
@@ -67,6 +81,7 @@ public class UserLocation {
         final ContentValues values = new ContentValues();
         // Note that ID is NOT included here
         values.put(COL_DATE, date);
+        values.put(COL_TIME, time);
         values.put(COL_LAT, lat);
         values.put(COL_LNG, lng);
         values.put(COL_NAME, name);

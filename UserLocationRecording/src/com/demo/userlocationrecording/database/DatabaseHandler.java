@@ -82,6 +82,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 success = true;
             }
         }
+        
+        if(success){
+        	notifyProviderOnUserLocationChange();
+        }
 
         return success;
 	}
@@ -93,8 +97,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 UserLocation.COL_ID + " IS ?",
                 new String[] { Long.toString(userLocation.id) });
 
+        if(result > 0){
+        	notifyProviderOnUserLocationChange();
+        }
         return result;
 	}
 	
-	
+	private void notifyProviderOnUserLocationChange() {
+        context.getContentResolver().notifyChange(
+                UserLocationProvider.URI_USER_LOCATIONS, null, false);
+    }
 }

@@ -6,6 +6,19 @@ import android.database.Cursor;
 import android.net.Uri;
 
 public class UserLocationProvider extends ContentProvider {
+	
+	// All URIs share these parts
+    public static final String AUTHORITY = "com.demo.userlocationrecording.provider";
+    public static final String SCHEME = "content://";
+
+    // URIs
+    // Used for all user locations
+    public static final String USER_LOCATIONS = SCHEME + AUTHORITY + "/userlocation";
+    public static final Uri URI_USER_LOCATIONS = Uri.parse(USER_LOCATIONS);
+    // Used for a single person, just add the id to the end
+    public static final String USER_LOCATION_BASE = USER_LOCATIONS + "/";
+
+	
 	public UserLocationProvider() {
 	}
 
@@ -31,14 +44,39 @@ public class UserLocationProvider extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		// TODO: Implement this to initialize your content provider on startup.
-		return false;
+		return true;
 	}
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
 		// TODO: Implement this to handle query requests from clients.
-		throw new UnsupportedOperationException("Not yet implemented");
+		Cursor result = null;
+        if (URI_USER_LOCATIONS.equals(uri)) {
+        	// query group by date, choose distinct
+        	result = DatabaseHandler
+                    .getInstance(getContext())
+                    .getReadableDatabase()
+                    .query(true, UserLocation.TABLE_NAME, UserLocation.FIELDS, null, null, UserLocation.COL_DATE,
+                            null, null, null);
+        	result.setNotificationUri(getContext().getContentResolver(), URI_USER_LOCATIONS);
+        }
+        else if (uri.toString().startsWith(USER_LOCATION_BASE)) {
+        	String chosen_date = uri.getLastPathSegment();
+            result = DatabaseHandler
+                    .getInstance(getContext())
+                    .getReadableDatabase()
+                    .query(UserLocation.TABLE_NAME, UserLocation.FIELDS,
+                            UserLocation.COL_DATE + " IS ?",
+                            new String[] { chosen_date }, null, null,
+                            null, null);
+            result.setNotificationUri(getContext().getContentResolver(), URI_USER_LOCATIONS);
+        }
+        else {
+        throw new UnsupportedOperationException("Not yet implemented");
+        }
+
+        return result;
 	}
 
 	@Override
@@ -47,4 +85,5 @@ public class UserLocationProvider extends ContentProvider {
 		// TODO: Implement this to handle requests to update one or more rows.
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
+	
 }

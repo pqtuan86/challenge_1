@@ -1,5 +1,13 @@
 package com.demo.userlocationrecording;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import com.demo.userlocationrecording.database.DatabaseHandler;
+import com.demo.userlocationrecording.database.UserLocation;
+import com.demo.userlocationrecording.places.ReverseGeocoding;
+
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
@@ -8,6 +16,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -60,6 +69,7 @@ public class GPSTrackingService extends Service implements LocationListener {
 
 	public Location getLocation() {
         try {
+        	latitude = -1;
             locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
 
             // getting GPS status
@@ -109,7 +119,10 @@ public class GPSTrackingService extends Service implements LocationListener {
                         }
                     }
                 }
-
+                if(latitude > 0){
+                	GetAddressTask getAddNameTask = new GetAddressTask(mContext);
+                    getAddNameTask.execute(latitude, longitude);
+                }
             }
 
         } catch (Exception e) {
@@ -228,6 +241,50 @@ public class GPSTrackingService extends Service implements LocationListener {
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	private class GetAddressTask extends AsyncTask<Double, Void, String>{
+
+		private Context mCtx;
+		
+		public GetAddressTask(Context context){
+			
+			this.mCtx = context;
+		}
+		
+		@Override
+		protected String doInBackground(Double... params) {
+			// TODO Auto-generated method stub
+			
+			Double lat, lng;
+			lat = params[0];
+			lng = params[1];
+			String nameOfPlace = ReverseGeocoding.getAddressFromCoordinates(lat, lng);
+			Log.i("received address============", nameOfPlace);
+			return nameOfPlace;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			
+			if(result != null){
+				addUserLocationToDatabase(result);
+			}
+		}
+		
+	}
+	
+	private void addUserLocationToDatabase(String name){
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
+		String currentDateTime = sdf.format(new Date());
+		String currentDate = currentDateTime.split("_")[0];
+		String currentTime = currentDateTime.split("_")[1];
+		Log.i("currentDate=======", currentDate);
+		UserLocation usrLocation = new UserLocation(currentDate, currentTime, String.valueOf(latitude), String.valueOf(longitude), name);
+		DatabaseHandler.getInstance(mContext).putUserLocation(usrLocation);
+		
 	}
 
 }
