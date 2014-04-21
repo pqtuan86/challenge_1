@@ -17,6 +17,10 @@ public class UserLocationProvider extends ContentProvider {
     public static final Uri URI_USER_LOCATIONS = Uri.parse(USER_LOCATIONS);
     // Used for a single person, just add the id to the end
     public static final String USER_LOCATION_BASE = USER_LOCATIONS + "/";
+    
+    public static final String USER_LOCATION_DATE_SEARCH = USER_LOCATION_BASE + "date";
+    public static final String USER_LOCATION_NAME_SEARCH = USER_LOCATION_BASE + "namesearch";
+    
 
 	
 	public UserLocationProvider() {
@@ -61,7 +65,7 @@ public class UserLocationProvider extends ContentProvider {
                             null, null, null);
         	result.setNotificationUri(getContext().getContentResolver(), URI_USER_LOCATIONS);
         }
-        else if (uri.toString().startsWith(USER_LOCATION_BASE)) {
+        else if (uri.toString().startsWith(USER_LOCATION_DATE_SEARCH)) {
         	String chosen_date = uri.getLastPathSegment();
             result = DatabaseHandler
                     .getInstance(getContext())
@@ -70,6 +74,20 @@ public class UserLocationProvider extends ContentProvider {
                             UserLocation.COL_DATE + " IS ?",
                             new String[] { chosen_date }, null, null,
                             null, null);
+            result.setNotificationUri(getContext().getContentResolver(), URI_USER_LOCATIONS);
+        } else if (uri.toString().startsWith(USER_LOCATION_NAME_SEARCH)) {
+        	String chosen_date = selectionArgs[0];
+        	String searchText = selectionArgs[1];
+            result = DatabaseHandler
+                    .getInstance(getContext())
+                    .getReadableDatabase()
+//                    .query(UserLocation.TABLE_NAME, UserLocation.FIELDS,
+//                            UserLocation.COL_DATE + " IS ?",
+//                            new String[] { chosen_date }, null, null,
+//                            null, null);
+                    .query(UserLocation.TABLE_NAME, UserLocation.FIELDS,
+                            UserLocation.COL_DATE + " IS ? AND " + UserLocation.COL_NAME + " LIKE ?",
+                            new String[] { chosen_date, "%"+searchText+"%" }, null, null, null, null);
             result.setNotificationUri(getContext().getContentResolver(), URI_USER_LOCATIONS);
         }
         else {

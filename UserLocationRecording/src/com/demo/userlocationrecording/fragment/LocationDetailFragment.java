@@ -21,7 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class LocationDetailFragment extends Fragment implements LoaderCallbacks<Cursor>{
+public class LocationDetailFragment extends Fragment {
 
 	ListView lstDetail;
 	public LocationDetailFragment(){
@@ -54,29 +54,8 @@ public class LocationDetailFragment extends Fragment implements LoaderCallbacks<
 	@Override
 	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
-		getLoaderManager().initLoader(0, null, this);
+//		getLoaderManager().initLoader(0, null, this);
 		super.onAttach(activity);
 	}
 
-	@Override
-	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-		// TODO Auto-generated method stub
-		String chosen_date = getArguments().getString("CHOSEN_DATE");
-		Log.i("chosen date in loader ======", chosen_date);
-		String urlLocationDetail = UserLocationProvider.USER_LOCATION_BASE + chosen_date;
-		return new CursorLoader(getActivity(), Uri.parse(urlLocationDetail), new String[]{UserLocation.COL_NAME,  UserLocation.COL_TIME}, null, null, null);
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-		// TODO Auto-generated method stub
-		((SimpleCursorAdapter)lstDetail.getAdapter()).swapCursor(cursor);
-	}
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		// TODO Auto-generated method stub
-		((SimpleCursorAdapter)lstDetail.getAdapter()).swapCursor(null);
-	}
-	
 }

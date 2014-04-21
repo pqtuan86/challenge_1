@@ -95,7 +95,7 @@ public class MainActivity extends ActionBarActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(context, DetailActivity.class);
+				Intent intent = new Intent(context, ListLocationActivity.class);
 				String selectedItemStr = ((Cursor)lstRecordedDates.getAdapter().getItem(position)).getString(1);
 				intent.putExtra("CHOSEN_DATE", selectedItemStr);
 				startActivity(intent);
