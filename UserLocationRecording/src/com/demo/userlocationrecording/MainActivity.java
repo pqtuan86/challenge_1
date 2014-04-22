@@ -3,19 +3,27 @@ package com.demo.userlocationrecording;
 import java.util.Calendar;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,10 +38,14 @@ import com.demo.userlocationrecording.database.UserLocationProvider;
 
 public class MainActivity extends ActionBarActivity {
 
+	static final String LOCATION_ACCESS_BROADCAST = "create_dialog";
+	final int CONTEXT_MENU_LOCATION_LIST 	= 1;
+	final int CONTEXT_MENU_LOCATION_MAP		= 2;
 	private Context context;
 	private PendingIntent pendingIntent;
 	
 	private ListView lstRecordedDates;
+	private String selectedItemStr;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -95,13 +107,73 @@ public class MainActivity extends ActionBarActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(context, ListLocationActivity.class);
-				String selectedItemStr = ((Cursor)lstRecordedDates.getAdapter().getItem(position)).getString(1);
-				intent.putExtra("CHOSEN_DATE", selectedItemStr);
-				startActivity(intent);
+//				Intent intent = new Intent(context, MapActivity.class);
+				Cursor selectedItemCursor = (Cursor)lstRecordedDates.getAdapter().getItem(position);
+				selectedItemStr = selectedItemCursor.getString(selectedItemCursor.getColumnIndex(UserLocation.COL_DATE));
+//				intent.putExtra("CHOSEN_DATE", selectedItemStr);
+//				startActivity(intent);
+				registerForContextMenu(lstRecordedDates);
+				openContextMenu(lstRecordedDates);
 			}
 		});
 	}
+	
+	private BroadcastReceiver receiver = new BroadcastReceiver(){
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			// TODO Auto-generated method stub
+			if(LOCATION_ACCESS_BROADCAST.equals(intent.getAction())){
+				showSettingsAlert();
+			}
+		}
+		
+	};
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LOCATION_ACCESS_BROADCAST));
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		// TODO Auto-generated method stub
+		menu.setHeaderTitle(getResources().getString(R.string.context_menu_title));
+		menu.addSubMenu(Menu.NONE, CONTEXT_MENU_LOCATION_LIST, Menu.NONE, "Open list location");
+		menu.addSubMenu(Menu.NONE, CONTEXT_MENU_LOCATION_MAP, Menu.NONE, "Open map location");
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		Intent intent;
+		switch (item.getItemId()) {
+		case CONTEXT_MENU_LOCATION_LIST:
+			intent = new Intent(context, ListLocationActivity.class);
+			intent.putExtra("CHOSEN_DATE", selectedItemStr);
+			startActivity(intent);
+			break;
+		case CONTEXT_MENU_LOCATION_MAP:
+			intent = new Intent(context, MapActivity.class);
+			intent.putExtra("CHOSEN_DATE", selectedItemStr);
+			startActivity(intent);
+			break;
+		default:
+			break;
+		}
+		return super.onContextItemSelected(item);
+	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -110,8 +182,6 @@ public class MainActivity extends ActionBarActivity {
 		getMenuInflater().inflate(R.menu.options_menu, menu);
 		MenuItem searchItem = menu.findItem(R.id.action_search);
 		searchItem.setVisible(false);
-//		SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-//		searchView.setVisibility(View.GONE);
 		
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -127,6 +197,43 @@ public class MainActivity extends ActionBarActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	/**
+     * Function to show settings alert dialog On pressing Settings button will
+     * lauch Settings Options
+     * */
+    public void showSettingsAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+
+        // Setting Dialog Title
+        alertDialog.setTitle("GPS settings");
+
+        // Setting Dialog Message
+        alertDialog
+                .setMessage("Location access is not enabled. Do you want to go to settings menu?");
+
+        // On pressing Settings button
+        alertDialog.setPositiveButton("Settings",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(
+                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        context.startActivity(intent);
+                    }
+                });
+
+        // on pressing cancel button
+        alertDialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        // Showing Alert Message
+        alertDialog.show();
+    }
+
 
 	/**
 	 * A placeholder fragment containing a simple view.

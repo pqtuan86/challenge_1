@@ -20,7 +20,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 public class GPSTrackingService extends Service implements LocationListener {
 
@@ -80,6 +82,8 @@ public class GPSTrackingService extends Service implements LocationListener {
 
             if (!isGPSEnabled && !isNetworkEnabled) {
                 // no available GPS provider
+            	sendBroadcast();
+            	stopSelf();
             } else {
                 this.canGetLocation = true;
                 if (isNetworkEnabled) {
@@ -175,42 +179,6 @@ public class GPSTrackingService extends Service implements LocationListener {
         return this.canGetLocation;
     }
 
-    /**
-     * Function to show settings alert dialog On pressing Settings button will
-     * lauch Settings Options
-     * */
-    public void showSettingsAlert() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
-
-        // Setting Dialog Title
-        alertDialog.setTitle("GPS settings");
-
-        // Setting Dialog Message
-        alertDialog
-                .setMessage("GPS is not enabled. Do you want to go to settings menu?");
-
-        // On pressing Settings button
-        alertDialog.setPositiveButton("Settings",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(
-                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        mContext.startActivity(intent);
-                    }
-                });
-
-        // on pressing cancel button
-        alertDialog.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-        // Showing Alert Message
-        alertDialog.show();
-    }
-
 	@Override
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
@@ -241,6 +209,11 @@ public class GPSTrackingService extends Service implements LocationListener {
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	private void sendBroadcast(){
+		Intent intent = new Intent(MainActivity.LOCATION_ACCESS_BROADCAST);
+		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 	
 	private class GetAddressTask extends AsyncTask<Double, Void, String>{

@@ -81,10 +81,6 @@ public class UserLocationProvider extends ContentProvider {
             result = DatabaseHandler
                     .getInstance(getContext())
                     .getReadableDatabase()
-//                    .query(UserLocation.TABLE_NAME, UserLocation.FIELDS,
-//                            UserLocation.COL_DATE + " IS ?",
-//                            new String[] { chosen_date }, null, null,
-//                            null, null);
                     .query(UserLocation.TABLE_NAME, UserLocation.FIELDS,
                             UserLocation.COL_DATE + " IS ? AND " + UserLocation.COL_NAME + " LIKE ?",
                             new String[] { chosen_date, "%"+searchText+"%" }, null, null, null, null);
