@@ -4,6 +4,8 @@ import java.util.Calendar;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,6 +17,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
@@ -22,6 +26,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -35,12 +40,14 @@ import android.widget.ListView;
 
 import com.demo.userlocationrecording.database.UserLocation;
 import com.demo.userlocationrecording.database.UserLocationProvider;
+import com.google.android.gms.drive.query.internal.NotFilter;
 
 public class MainActivity extends ActionBarActivity {
 
 	static final String LOCATION_ACCESS_BROADCAST = "create_dialog";
 	final int CONTEXT_MENU_LOCATION_LIST 	= 1;
 	final int CONTEXT_MENU_LOCATION_MAP		= 2;
+	final int NOTIFICATION_ID = 1;
 	private Context context;
 	private PendingIntent pendingIntent;
 	
@@ -133,6 +140,7 @@ public class MainActivity extends ActionBarActivity {
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
+		Log.i("Onpauseeeeeeeeee", "is called");
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 		super.onPause();
 	}
@@ -142,6 +150,18 @@ public class MainActivity extends ActionBarActivity {
 		// TODO Auto-generated method stub
 		super.onResume();
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LOCATION_ACCESS_BROADCAST));
+		createAnOngoingNotification();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		Log.i("OnDestroyyyyyyyyyyyyyyyyyy=", "is called");
+		NotificationManager mNotificationManager =
+	    	    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+	    	// mId allows you to update the notification later on.
+	    	mNotificationManager.cancel(NOTIFICATION_ID);
+		super.onDestroy();
 	}
 
 	@Override
@@ -235,6 +255,45 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+    private void createAnOngoingNotification(){
+    	NotificationCompat.Builder mBuilder =
+    	        new NotificationCompat.Builder(this)
+    	        .setSmallIcon(R.drawable.ic_ongoing)
+    	        .setContentTitle("User location")
+    	        .setContentText("Recording...");
+    	mBuilder.build().flags = Notification.FLAG_ONGOING_EVENT;
+    	// Creates an explicit intent for an Activity in your app
+    	Intent resultIntent = new Intent(this, MainActivity.class);
+
+    	// The stack builder object will contain an artificial back stack for the
+    	// started Activity.
+    	// This ensures that navigating backward from the Activity leads out of
+    	// your application to the Home screen.
+//    	TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+//    	// Adds the back stack for the Intent (but not the Intent itself)
+//    	stackBuilder.addParentStack(MainActivity.class);
+//    	// Adds the Intent that starts the Activity to the top of the stack
+//    	stackBuilder.addNextIntent(resultIntent);
+//    	PendingIntent resultPendingIntent =
+//    	        stackBuilder.getPendingIntent(
+//    	            0,
+//    	            PendingIntent.FLAG_UPDATE_CURRENT
+//    	        );
+    	PendingIntent resultPendingIntent =
+    		    PendingIntent.getActivity(
+    		    this,
+    		    0,
+    		    resultIntent,
+    		    PendingIntent.FLAG_UPDATE_CURRENT
+    		);
+    	mBuilder.setContentIntent(resultPendingIntent);
+    	NotificationManager mNotificationManager =
+    	    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    	// mId allows you to update the notification later on.
+    	mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    }
+    
+    
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
