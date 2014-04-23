@@ -6,6 +6,8 @@ import java.util.Date;
 
 import com.demo.userlocationrecording.database.DatabaseHandler;
 import com.demo.userlocationrecording.database.UserLocation;
+import com.demo.userlocationrecording.database.UserLocationProvider;
+import com.demo.userlocationrecording.helper.NetworkUtil;
 import com.demo.userlocationrecording.places.ReverseGeocoding;
 
 import android.app.AlertDialog;
@@ -123,7 +125,7 @@ public class GPSTrackingService extends Service implements LocationListener {
                         }
                     }
                 }
-                if(latitude > 0){
+                if(latitude > 0 && NetworkUtil.haveInternetConnection(this)){
                 	GetAddressTask getAddNameTask = new GetAddressTask(mContext);
                     getAddNameTask.execute(latitude, longitude);
                 }
@@ -233,7 +235,7 @@ public class GPSTrackingService extends Service implements LocationListener {
 			lat = params[0];
 			lng = params[1];
 			String nameOfPlace = ReverseGeocoding.getAddressFromCoordinates(lat, lng);
-			Log.i("received address============", nameOfPlace);
+//			Log.i("received address============", nameOfPlace);
 			return nameOfPlace;
 		}
 
@@ -256,7 +258,8 @@ public class GPSTrackingService extends Service implements LocationListener {
 		String currentTime = currentDateTime.split("_")[1];
 		Log.i("currentDate=======", currentDate);
 		UserLocation usrLocation = new UserLocation(currentDate, currentTime, String.valueOf(latitude), String.valueOf(longitude), name);
-		DatabaseHandler.getInstance(mContext).putUserLocation(usrLocation);
+		mContext.getContentResolver().insert(UserLocationProvider.URI_USER_LOCATIONS, usrLocation.getContent());
+//		DatabaseHandler.getInstance(mContext).putUserLocation(usrLocation);
 		
 	}
 

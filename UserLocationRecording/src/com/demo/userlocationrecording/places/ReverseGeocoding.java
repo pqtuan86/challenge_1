@@ -69,7 +69,7 @@ public class ReverseGeocoding {
 	}
 	
 	public static String getAddressFromCoordinates(double lat, double lng){
-		String result = "";
+		String result = null;
 		JSONObject listAddObj = getAddressList(lat, lng);
 		if(listAddObj != null){
 			try {

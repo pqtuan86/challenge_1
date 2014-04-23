@@ -189,3 +189,5 @@ UserLocationRecording/bin/classes/com/google/android/gms/R.class
 UserLocationRecording/bin/dexedLibs/google-play-services-cbbfc37f31a592d90cb78e2584876be0.jar
 UserLocationRecording/bin/dexedLibs/google-play-services_lib-f2e77a9f898e423bb359cc662ee76238.jar
 UserLocationRecording/gen/com/google/android/gms/R.java
+UserLocationRecording/bin/classes/com/demo/userlocationrecording/helper/GlobalConstants.class
+UserLocationRecording/bin/classes/com/demo/userlocationrecording/helper/NetworkUtil.class

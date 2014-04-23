@@ -1,10 +1,6 @@
 package com.demo.userlocationrecording;
 
 
-import com.demo.userlocationrecording.database.UserLocation;
-import com.demo.userlocationrecording.database.UserLocationProvider;
-import com.demo.userlocationrecording.fragment.LocationDetailFragment;
-
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
+import com.demo.userlocationrecording.database.UserLocation;
+import com.demo.userlocationrecording.database.UserLocationProvider;
 
 public class ListLocationActivity extends ActionBarActivity implements LoaderCallbacks<Cursor>{
 

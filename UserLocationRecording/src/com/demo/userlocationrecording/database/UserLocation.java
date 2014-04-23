@@ -73,13 +73,30 @@ public class UserLocation {
         this.name = cursor.getString(5);
     }
 
+    
+    /**
+     * Convert information from the database into a UserLocation object.
+     */
+    public UserLocation(final ContentValues value) {
+        // Indices expected to match order in FIELDS!
+        if(value.getAsLong(COL_ID) != null){
+        	this.id = value.getAsLong(COL_ID);
+        } else {
+        	this.id = -1;
+        }
+        this.date = value.getAsString(COL_DATE);
+        this.time = value.getAsString(COL_TIME);
+        this.lat = value.getAsString(COL_LAT);
+        this.lng = value.getAsString(COL_LNG);
+        this.name = value.getAsString(COL_NAME);
+    }
     /**
      * Return the fields in a ContentValues object, suitable for insertion
      * into the database.
      */
     public ContentValues getContent() {
         final ContentValues values = new ContentValues();
-        // Note that ID is NOT included here
+        // ignore the id value
         values.put(COL_DATE, date);
         values.put(COL_TIME, time);
         values.put(COL_LAT, lat);
