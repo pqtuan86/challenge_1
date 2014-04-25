@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 
 public class GPSTrackingService extends Service implements LocationListener {
 
+	private final String LOCATION_NAME_UNDEFINED = "undefined";
 	private final Context mContext;
 
     // flag for GPS status
@@ -69,11 +71,9 @@ public class GPSTrackingService extends Service implements LocationListener {
 		return Service.START_STICKY;
 	}
 
-
-
-	public Location getLocation() {
+	protected void getLocation() {
         try {
-        	latitude = -1;
+        	location = null;
             locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
 
             // getting GPS status
@@ -125,17 +125,20 @@ public class GPSTrackingService extends Service implements LocationListener {
                         }
                     }
                 }
-                if(latitude > 0 && NetworkUtil.haveInternetConnection(this)){
+                if(NetworkUtil.haveInternetConnection(this)){
                 	GetAddressTask getAddNameTask = new GetAddressTask(mContext);
                     getAddNameTask.execute(latitude, longitude);
+                } else {
+                	// save to database with no place's name
+                	addUserLocationToDatabase(UserLocationProvider.URI_USER_LOCATION_NO_NAME, LOCATION_NAME_UNDEFINED);
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return location;
+        // stop the service
+        stopSelf();
     }
 
     /**
@@ -244,13 +247,13 @@ public class GPSTrackingService extends Service implements LocationListener {
 			// TODO Auto-generated method stub
 			
 			if(result != null){
-				addUserLocationToDatabase(result);
+				addUserLocationToDatabase(UserLocationProvider.URI_USER_LOCATION, result);
 			}
 		}
 		
 	}
 	
-	private void addUserLocationToDatabase(String name){
+	private void addUserLocationToDatabase(Uri uri, String name){
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
 		String currentDateTime = sdf.format(new Date());
@@ -258,7 +261,7 @@ public class GPSTrackingService extends Service implements LocationListener {
 		String currentTime = currentDateTime.split("_")[1];
 		Log.i("currentDate=======", currentDate);
 		UserLocation usrLocation = new UserLocation(currentDate, currentTime, String.valueOf(latitude), String.valueOf(longitude), name);
-		mContext.getContentResolver().insert(UserLocationProvider.URI_USER_LOCATIONS, usrLocation.getContent());
+		mContext.getContentResolver().insert(uri, usrLocation.getContent());
 //		DatabaseHandler.getInstance(mContext).putUserLocation(usrLocation);
 		
 	}

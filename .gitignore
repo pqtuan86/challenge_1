@@ -191,3 +191,5 @@ UserLocationRecording/bin/dexedLibs/google-play-services_lib-f2e77a9f898e423bb35
 UserLocationRecording/gen/com/google/android/gms/R.java
 UserLocationRecording/bin/classes/com/demo/userlocationrecording/helper/GlobalConstants.class
 UserLocationRecording/bin/classes/com/demo/userlocationrecording/helper/NetworkUtil.class
+UserLocationRecording/bin/classes/com/demo/userlocationrecording/UpdateLocationNameService.class
+UserLocationRecording/bin/classes/com/demo/userlocationrecording/receiver/NetworkStateChangeReceiver.class

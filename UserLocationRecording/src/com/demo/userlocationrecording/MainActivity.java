@@ -81,7 +81,7 @@ public class MainActivity extends ActionBarActivity {
 	
 		calendar.add(Calendar.SECOND, 2*60);
 	
-		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1*60*1000, pendingIntent);
+		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 2*60*1000, pendingIntent);
 		
 		lstRecordedDates = (ListView) findViewById(R.id.id_lst_date);
 		lstRecordedDates.setAdapter(new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1, null, 
@@ -92,7 +92,7 @@ public class MainActivity extends ActionBarActivity {
 			@Override
 			public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 				// TODO Auto-generated method stub
-				return new CursorLoader(context, UserLocationProvider.URI_USER_LOCATIONS, new String[] {UserLocation.COL_DATE}, null, null, null);
+				return new CursorLoader(context, UserLocationProvider.URI_USER_LOCATION, new String[] {UserLocation.COL_DATE}, null, null, null);
 			}
 
 			@Override

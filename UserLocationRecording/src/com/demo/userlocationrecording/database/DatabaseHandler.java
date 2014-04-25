@@ -30,7 +30,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		// TODO Auto-generated method stub
-		db.execSQL(UserLocation.CREATE_TABLE);
+		db.execSQL(UserLocation.CREATE_TABLE_USER_LOCATION);
+		db.execSQL(UserLocation.CREATE_TABLE_USER_LOCATION_NO_NAME);
 	}
 
 	@Override
@@ -39,10 +40,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	}
 	
-	public synchronized UserLocation getUserLocation(final long id){
+	public synchronized UserLocation getUserLocation(final long id, String tableName){
 		
 		final SQLiteDatabase db = this.getReadableDatabase();
-        final Cursor cursor = db.query(UserLocation.TABLE_NAME,
+        final Cursor cursor = db.query(tableName,
         		UserLocation.FIELDS, UserLocation.COL_ID + " IS ?",
                 new String[] { String.valueOf(id) }, null, null, null, null);
         if (cursor == null || cursor.isAfterLast()) {
@@ -58,14 +59,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return item;
 	}
 
-	public synchronized boolean putUserLocation(final UserLocation userLocation){
+	public synchronized boolean putUserLocation(final UserLocation userLocation, String tableName){
 		
 		boolean success = false;
         int result = 0;
         final SQLiteDatabase db = this.getWritableDatabase();
 
         if (userLocation.id > -1) {
-            result += db.update(UserLocation.TABLE_NAME, userLocation.getContent(),
+            result += db.update(tableName, userLocation.getContent(),
                     UserLocation.COL_ID + " IS ?",
                     new String[] { String.valueOf(userLocation.id) });
         }
@@ -74,7 +75,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             success = true;
         } else {
             // Update failed or wasn't possible, insert instead
-            final long id = db.insert(UserLocation.TABLE_NAME, null,
+            final long id = db.insert(tableName, null,
                     userLocation.getContent());
 
             if (id > -1) {
@@ -90,12 +91,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return success;
 	}
 	
-	public synchronized int removeUserLocation(final UserLocation userLocation){
+	public synchronized int removeUserLocation(final long id, String tableName){
 		
 		final SQLiteDatabase db = this.getWritableDatabase();
-        final int result = db.delete(UserLocation.TABLE_NAME,
+        final int result = db.delete(tableName,
                 UserLocation.COL_ID + " IS ?",
-                new String[] { Long.toString(userLocation.id) });
+                new String[] { Long.toString(id) });
 
         if(result > 0){
         	notifyProviderOnUserLocationChange();
@@ -105,6 +106,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	private void notifyProviderOnUserLocationChange() {
         context.getContentResolver().notifyChange(
-                UserLocationProvider.URI_USER_LOCATIONS, null, false);
+                UserLocationProvider.URI_USER_LOCATION, null, false);
     }
 }

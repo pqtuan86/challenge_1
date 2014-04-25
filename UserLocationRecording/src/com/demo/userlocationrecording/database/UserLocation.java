@@ -5,8 +5,9 @@ import android.database.Cursor;
 
 public class UserLocation {
 	
-	// SQL convention says Table name should be "singular", so not Persons
-    public static final String TABLE_NAME = "UserLocation";
+	// SQL convention says Table name should be "singular", so not UserLocations
+    public static final String TABLE_USER_LOCATION = "UserLocation";
+    public static final String TABLE_USER_LOCATION_NO_NAME = "UserLocationNameUndefined";
     // Naming the id column with an underscore is good to be consistent
     // with other Android things. This is ALWAYS needed
     public static final String COL_ID = "_id";
@@ -26,8 +27,8 @@ public class UserLocation {
      * Note that the last row does NOT end in a comma like the others.
      * This is a common source of error.
      */
-    public static final String CREATE_TABLE =
-            "CREATE TABLE " + TABLE_NAME + "("
+    public static final String CREATE_TABLE_USER_LOCATION =
+            "CREATE TABLE " + TABLE_USER_LOCATION + "("
             + COL_ID + " INTEGER PRIMARY KEY,"
             + COL_DATE + " TEXT NOT NULL DEFAULT '',"
             + COL_TIME + " TEXT NOT NULL DEFAULT '',"
@@ -36,6 +37,15 @@ public class UserLocation {
             + COL_NAME + " TEXT NOT NULL DEFAULT ''"
             + ")";
 
+    public static final String CREATE_TABLE_USER_LOCATION_NO_NAME =
+            "CREATE TABLE " + TABLE_USER_LOCATION_NO_NAME + "("
+            + COL_ID + " INTEGER PRIMARY KEY,"
+            + COL_DATE + " TEXT NOT NULL DEFAULT '',"
+            + COL_TIME + " TEXT NOT NULL DEFAULT '',"
+            + COL_LAT + " TEXT NOT NULL DEFAULT '',"
+            + COL_LNG + " TEXT NOT NULL DEFAULT '',"
+            + COL_NAME + " TEXT NOT NULL DEFAULT ''"
+            + ")";
     // Fields corresponding to database columns
     public long id = -1;
     public String date = "";
@@ -59,7 +69,6 @@ public class UserLocation {
     	this.name = nameOfPlace;
     }
     
-
     /**
      * Convert information from the database into a UserLocation object.
      */
